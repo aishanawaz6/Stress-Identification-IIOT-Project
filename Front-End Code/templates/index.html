@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stress Identification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #007bff;
+    }
+    h2 {
+      color: #007bff;
+    }
+    p {
+      color: #6c757d;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ced4da;
+      padding-bottom: 10px;
+    }
+    strong {
+      font-weight: bold;
+    }
+    .stress {
+      color: #dc3545;
+    }
+    .nostress {
+      color: #28a745;
+    }
+    .show-readings, .restart-button {
+      margin-top: 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .loading {
+      display: none;
+    }
+    .stress-info {
+      margin-top: 50px;
+      text-align: left;
+    }
+.instructions {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+}
+
+.instructions h2 {
+  color: #007bff;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+<h1>Stress Identification</h1>
+  <div class="instructions">
+  <h2>Instructions</h2>
+  <p>Place your finger on the MAX30102 Heart Rate and DHT11 Temperature sensors to start detecting stress.</p>
+  <p>Make sure the Red Led on MAX30102 Heart Rate sensor is on before placing your finger.</p>
+  <p>Once your finger is in place, click the "Start" button below to initiate the stress detection process.</p>
+  </div>
+    <button class="show-readings" onclick="startDetection()">Start</button>
+    <p></p>
+    <div class="loading" id="loading">Detecting Your Stress...</div>
+    <div id="readings">
+      <ul>
+        <!-- Data will be populated here -->
+      </ul>
+    </div>
+    <button class="restart-button" style="display: none;" onclick="restartDetection()">Restart</button>
+    <div class="stress-info">
+      <h2>Stress Facts</h2>
+      <ul>
+        <li>Stress is the body's reaction to any change that requires an adjustment or response.</li>
+        <li>Chronic stress can lead to serious health problems such as heart disease, high blood pressure, diabetes, and mental disorders.</li>
+        <li>Managing stress through relaxation techniques, exercise, and a healthy lifestyle can improve overall well-being.</li>
+        <li>Stress can affect memory, concentration, and decision-making abilities.</li>
+        <li>Stressful events can trigger the body's "fight or flight" response, leading to increased heart rate and adrenaline production.</li>
+        <li>Long-term stress can weaken the immune system and make individuals more susceptible to illnesses.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function startDetection() {
+      document.getElementById('loading').style.display = 'block';
+        loadData();
+    }
+
+    function restartDetection() {
+      document.getElementById('readings').style.display = 'none';
+      document.querySelector('#readings ul').innerHTML = '';
+      document.querySelector('.show-readings').style.display = 'inline-block';
+      document.querySelector('.restart-button').style.display = 'none';
+    }
+
+function loadData() {
+  var readingsList = document.querySelector('#readings ul');
+ // readings is data recv from mqtt brooker
+  var readings = {{ readings | tojson }};
+  readingsList.innerHTML = ''; // Clear previous data
+  readings.forEach(function(reading) {
+    var li = document.createElement('li');
+    li.className = reading['Stress'].replace(' ', '').toLowerCase();
+    li.innerHTML = '<strong>Heart Rate:</strong> ' + reading['Heart Rate'] + ', <strong>Temperature:</strong> ' + reading['Temperature'] + ', <strong>Stress Status:</strong> ' + reading['Stress'];
+    readingsList.appendChild(li);
+  });
+  var sourceInfo = document.createElement('p');
+  sourceInfo.innerHTML = '<small>Stress detection method based on: Hendryani, Atika et al. (2023). Real-time stress detection and monitoring system using IoT-based physiological signals. Bulletin of Electrical Engineering and Informatics, 12(5), 2807-2815. doi: 10.11591/eei.v12i5.5132.</small>';
+  readingsList.appendChild(sourceInfo);
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('readings').style.display = 'block';
+  document.querySelector('.show-readings').style.display = 'none';
+  document.querySelector('.restart-button').style.display = 'inline-block';
+}
+
+  </script>
+</body>
+</html>
